@@ -10,7 +10,6 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.utils import configclass
 
-
 from simulator import ASSETS_ROOT
 from simulator.assets.scenes.kitchen import KITCHEN_CFG
 
@@ -37,21 +36,18 @@ FRIDGE_OBJECTS_ROOT = FRIDGE_ORG_ROOT / "objects"
 class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     """Scene configuration for fridge organization."""
 
-    # use kitchen background scene
     scene: AssetBaseCfg = KITCHEN_CFG.replace(
         prim_path="{ENV_REGEX_NS}/Scene"
     )
 
-    # cameras disabled for headless operation; re-enable on GlowsAI with --enable_cameras
     wrist = None
     front = None
 
     # -----------------------------------------------------
-    # Fridge (static large object)
+    # Fridge (kinematic box — hand arm's opposite side)
+    # Robot is at y=-0.74, facing +y, so fridge goes at y=+0.40
     # -----------------------------------------------------
 
-    # fridge is static — use AssetBaseCfg, no RigidBodyAPI needed
-    # 把原本的 fridge AssetBaseCfg 整段換掉
     fridge: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/fridge",
         spawn=sim_utils.CuboidCfg(
@@ -64,16 +60,15 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(2.00, 3.00, 0.30),
+            pos=(0.35, 0.40, 0.30),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
     # -----------------------------------------------------
-    # Apple
+    # Apple — on table, left side
     # -----------------------------------------------------
 
-    # placeholder shapes — replace with complete USD packages once available
     apple: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/apple",
         spawn=sim_utils.SphereCfg(
@@ -86,13 +81,13 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.35, -0.20, 0.85),
+            pos=(0.35, -0.20, 1.05),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
     # -----------------------------------------------------
-    # Drink
+    # Drink — on table, center
     # -----------------------------------------------------
 
     drink: RigidObjectCfg = RigidObjectCfg(
@@ -108,13 +103,13 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.35, 0.00, 0.85),
+            pos=(0.35, 0.00, 1.05),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
     # -----------------------------------------------------
-    # Snack
+    # Snack — on table, right side
     # -----------------------------------------------------
 
     snack: RigidObjectCfg = RigidObjectCfg(
@@ -129,14 +124,14 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.35, 0.20, 0.85),
+            pos=(0.35, 0.20, 1.05),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
 
 # =========================================================
-# Observations (no cameras — headless compatible)
+# Observations
 # =========================================================
 
 
@@ -170,29 +165,17 @@ def apple_inside_fridge(
     env,
     apple_cfg: SceneEntityCfg,
 ) -> torch.Tensor:
-    """
-    Success condition:
-    apple reaches fridge area.
-    """
-
     apple: RigidObject = env.scene[apple_cfg.name]
-
     apple_pos = apple.data.root_pos_w - env.scene.env_origins
 
-    done = torch.ones(
-        env.num_envs,
-        dtype=torch.bool,
-        device=env.device,
-    )
+    done = torch.ones(env.num_envs, dtype=torch.bool, device=env.device)
 
-    # fridge region bounds
-    done = torch.logical_and(done, apple_pos[:, 0] > 0.60)
-    done = torch.logical_and(done, apple_pos[:, 0] < 0.90)
-
-    done = torch.logical_and(done, apple_pos[:, 1] > -0.25)
-    done = torch.logical_and(done, apple_pos[:, 1] < 0.25)
-
-    done = torch.logical_and(done, apple_pos[:, 2] > 0.50)
+    # fridge bounds: x in [0.20, 0.50], y in [0.25, 0.55], z > 0.0
+    done = torch.logical_and(done, apple_pos[:, 0] > 0.20)
+    done = torch.logical_and(done, apple_pos[:, 0] < 0.50)
+    done = torch.logical_and(done, apple_pos[:, 1] > 0.25)
+    done = torch.logical_and(done, apple_pos[:, 1] < 0.55)
+    done = torch.logical_and(done, apple_pos[:, 2] > 0.00)
 
     return done
 
@@ -204,13 +187,9 @@ def apple_inside_fridge(
 
 @configclass
 class TerminationsCfg(SingleArmFrankaTerminationsCfg):
-    """Termination configuration."""
-
     success = DoneTerm(
         func=apple_inside_fridge,
-        params={
-            "apple_cfg": SceneEntityCfg("apple"),
-        },
+        params={"apple_cfg": SceneEntityCfg("apple")},
     )
 
 
@@ -220,55 +199,24 @@ class TerminationsCfg(SingleArmFrankaTerminationsCfg):
 
 
 @configclass
-class FridgeOrganizationEnvCfg(
-    SingleArmFrankaTaskEnvCfg
-):
+class FridgeOrganizationEnvCfg(SingleArmFrankaTaskEnvCfg):
     """Fridge organization task."""
 
-    scene: FridgeOrganizationSceneCfg = (
-        FridgeOrganizationSceneCfg(env_spacing=8.0)
-    )
-
-    observations: FridgeOrganizationObservationsCfg = (
-        FridgeOrganizationObservationsCfg()
-    )
-
-    terminations: TerminationsCfg = (
-        TerminationsCfg()
-    )
-
-    task_description: str = (
-        "pick up the apple and place it into the fridge."
-    )
+    scene: FridgeOrganizationSceneCfg = FridgeOrganizationSceneCfg(env_spacing=8.0)
+    observations: FridgeOrganizationObservationsCfg = FridgeOrganizationObservationsCfg()
+    terminations: TerminationsCfg = TerminationsCfg()
+    task_description: str = "pick up the apple and place it into the fridge."
 
     def __post_init__(self) -> None:
         super().__post_init__()
-
-        # -------------------------------------------------
-        # Viewer
-        # -------------------------------------------------
 
         self.viewer.eye = (1.5, 1.5, 1.2)
         self.viewer.lookat = (0.5, 0.0, 0.5)
 
         self.dynamic_reset_gripper_effort_limit = False
 
-        # -------------------------------------------------
-        # Robot Initial Pose
-        # -------------------------------------------------
-
-        self.scene.robot.init_state.pos = (
-            0.35,
-            -0.74,
-            0.01,
-        )
-
-        self.scene.robot.init_state.rot = (
-            0.707,
-            0.0,
-            0.0,
-            0.707,
-        )
+        self.scene.robot.init_state.pos = (0.35, -0.74, 0.01)
+        self.scene.robot.init_state.rot = (0.707, 0.0, 0.0, 0.707)
 
         self.scene.robot.init_state.joint_pos = {
             "panda_joint1": 0.0,
