@@ -10,13 +10,9 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.utils import configclass
 
-from leisaac.utils.general_assets import parse_usd_and_create_subassets
 
 from simulator import ASSETS_ROOT
-from simulator.assets.scenes.kitchen import (
-    KITCHEN_CFG,
-    KITCHEN_USD_PATH,
-)
+from simulator.assets.scenes.kitchen import KITCHEN_CFG
 
 from simulator.tasks.template import mdp
 from simulator.tasks.template.single_arm_franka_cfg import (
@@ -55,18 +51,20 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     # -----------------------------------------------------
 
     # fridge is static — use AssetBaseCfg, no RigidBodyAPI needed
-    fridge: AssetBaseCfg = AssetBaseCfg(
+    # 把原本的 fridge AssetBaseCfg 整段換掉
+    fridge: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/fridge",
-        spawn=sim_utils.UsdFileCfg(
-            usd_path=str(
-                FRIDGE_OBJECTS_ROOT
-                / "fridge"
-                / "model_fridge_1.usd"
+        spawn=sim_utils.CuboidCfg(
+            size=(0.60, 0.60, 1.20),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
+            mass_props=sim_utils.MassPropertiesCfg(mass=50.0),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(
+                diffuse_color=(0.8, 0.8, 0.9)
             ),
-            scale=(1.0, 1.0, 1.0),
         ),
-        init_state=AssetBaseCfg.InitialStateCfg(
-            pos=(0.75, 0.0, 0.0),
+        init_state=RigidObjectCfg.InitialStateCfg(
+            pos=(0.75, 0.0, 0.60),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -283,12 +281,3 @@ class FridgeOrganizationEnvCfg(
             "panda_finger_joint1": 0.04,
             "panda_finger_joint2": 0.04,
         }
-
-        # -------------------------------------------------
-        # Parse Kitchen Scene
-        # -------------------------------------------------
-
-        parse_usd_and_create_subassets(
-            KITCHEN_USD_PATH,
-            self,
-        )
