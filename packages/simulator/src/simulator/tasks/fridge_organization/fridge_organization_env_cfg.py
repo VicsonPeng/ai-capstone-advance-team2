@@ -72,9 +72,9 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     apple: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/apple",
         spawn=sim_utils.SphereCfg(
-            radius=0.04,
+            radius=0.032,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.01),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(
                 diffuse_color=(0.8, 0.1, 0.1)
@@ -93,10 +93,10 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     drink: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/drink",
         spawn=sim_utils.CylinderCfg(
-            radius=0.03,
-            height=0.12,
+            radius=0.024,
+            height=0.096,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.01),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(
                 diffuse_color=(0.1, 0.3, 0.8)
@@ -115,9 +115,9 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     snack: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/snack",
         spawn=sim_utils.CuboidCfg(
-            size=(0.08, 0.05, 0.03),
+            size=(0.064, 0.04, 0.024),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.01),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(
                 diffuse_color=(0.9, 0.7, 0.2)
