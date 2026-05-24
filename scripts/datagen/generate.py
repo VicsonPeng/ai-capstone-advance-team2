@@ -27,6 +27,7 @@ import time
 
 from isaaclab.app import AppLauncher
 
+
 parser = argparse.ArgumentParser(description="State machine data generation for LeIsaac tasks.")
 parser.add_argument("--num_envs", type=int, default=1, help="Number of environments to simulate.")
 parser.add_argument("--task", type=str, required=True, help="Name of the task.")
@@ -69,6 +70,7 @@ from leisaac.utils.env_utils import dynamic_reset_gripper_effort_limit_sim
 from simulator.datagen.state_machine.cup_stacking import CupStackingStateMachine
 from simulator.datagen.state_machine.cutlery_arrangement import CutleryArrangementStateMachine
 from simulator.datagen.state_machine.toy_blocks_collection import ToyBlocksCollectionStateMachine
+from simulator.datagen.state_machine.fridge_organization import FridgeOrganizationStateMachine
 from simulator.utils.object_poses_loader import load_episode_poses
 
 # Maps gym task id → (StateMachineClass, device_type)
@@ -77,6 +79,7 @@ TASK_REGISTRY = {
     "HCIS-CupStacking-SingleArm-v0": (CupStackingStateMachine, "keyboard"),
     "HCIS-ToyBlocksCollection-SingleArm-v0": (ToyBlocksCollectionStateMachine, "keyboard"),
     "HCIS-CutleryArrangement-SingleArm-v0": (CutleryArrangementStateMachine, "keyboard"),
+    "HCIS-FridgeOrganization-SingleArm-v0": (FridgeOrganizationStateMachine, "keyboard"),  # 加這行
 }
 
 
