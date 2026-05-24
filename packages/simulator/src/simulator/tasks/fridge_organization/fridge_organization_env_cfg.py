@@ -74,7 +74,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
         spawn=sim_utils.SphereCfg(
             radius=0.04,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.01),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(
                 diffuse_color=(0.8, 0.1, 0.1)
@@ -96,7 +96,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             radius=0.03,
             height=0.12,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.01),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(
                 diffuse_color=(0.1, 0.3, 0.8)
@@ -117,7 +117,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
         spawn=sim_utils.CuboidCfg(
             size=(0.08, 0.05, 0.03),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.01),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(
                 diffuse_color=(0.9, 0.7, 0.2)
