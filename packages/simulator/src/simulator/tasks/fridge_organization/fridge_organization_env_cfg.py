@@ -103,7 +103,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.0, -0.15, 0.84),
+            pos=(0.45, -0.15, 0.84),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
