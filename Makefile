@@ -1,6 +1,6 @@
 .PHONY: install install-dev test \
 	submodules submodules-pull \
-	build-isaaclab launch-isaaclab \
+	build-isaaclab launch-isaaclab launch-isaaclab-local \
 	launch-isaaclab-glowsai-4090 launch-isaaclab-glowsai-l40s \
 	check-isaaclab-gpu
 
@@ -92,6 +92,54 @@ launch-isaaclab: build-isaaclab
 			echo "== Vulkan ICD candidates =="; \
 			ls -l /usr/share/vulkan/icd.d /etc/vulkan/icd.d 2>/dev/null || true; \
 			$(select_vulkan_icd); \
+			$(require_runtime_libs); \
+			cd /workspace/aicapstone; \
+			exec /bin/bash \
+		'
+
+# ---- Launch: local Optimus laptop (software Vulkan + Xvfb, no RTX crash) ----
+# Prerequisites: sudo apt-get install -y xvfb
+launch-isaaclab-local: build-isaaclab
+	@set -e; \
+	if ! command -v Xvfb >/dev/null 2>&1; then \
+		echo "ERROR: Xvfb not found. Run: sudo apt-get install -y xvfb" >&2; \
+		exit 1; \
+	fi; \
+	if ! pgrep -x Xvfb >/dev/null 2>&1; then \
+		echo "== Starting Xvfb virtual display :99 =="; \
+		Xvfb :99 -screen 0 1920x1080x24 -ac +extension GLX +render -noreset & \
+		sleep 2; \
+	else \
+		echo "== Xvfb already running =="; \
+	fi; \
+	xhost +local:root >/dev/null || true; \
+	trap 'xhost -local:root >/dev/null || true' EXIT; \
+	docker run --rm -it \
+		--name $(CONTAINER_NAME)-local \
+		--gpus '"device=$(GPU)"' \
+		--net=host \
+		--ipc=host \
+		--ulimit memlock=-1 \
+		--ulimit stack=67108864 \
+		-v $(shell pwd):/workspace/aicapstone \
+		-v /workspace/aicapstone/.venv \
+		-v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+		-v /usr/share/vulkan/icd.d:/usr/share/vulkan/icd.d:ro \
+		-v /etc/vulkan/icd.d:/etc/vulkan/icd.d:ro \
+		-e DISPLAY=:99 \
+		-e VK_ICD_FILENAMES=/usr/share/vulkan/icd.d/lvp_icd.x86_64.json \
+		-e OMNI_KIT_ACCEPT_EULA=Y \
+		-e PRIVACY_CONSENT=Y \
+		-e QT_X11_NO_MITSHM=1 \
+		-e NVIDIA_VISIBLE_DEVICES=$(GPU) \
+		-e NVIDIA_DRIVER_CAPABILITIES=graphics,display,utility,compute \
+		$(IMAGE) \
+		bash -lc '\
+			set -e; \
+			echo "=== Local: software Vulkan (LLVMpipe) + Xvfb ==="; \
+			echo "Display: $$DISPLAY"; \
+			echo "VK ICD: $$VK_ICD_FILENAMES"; \
+			echo "== GPU check =="; nvidia-smi || true; \
 			$(require_runtime_libs); \
 			cd /workspace/aicapstone; \
 			exec /bin/bash \
