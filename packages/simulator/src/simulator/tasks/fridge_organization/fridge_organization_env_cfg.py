@@ -60,7 +60,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.45, 0.35, 1.10),
+            pos=(0.35, 0.30, 1.10),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -81,7 +81,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.45, -0.15, 0.84), 
+            pos=(0.35, -0.10, 0.84),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -103,7 +103,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.45, 0.15, 0.84),
+            pos=(0.35, 0.05, 0.84),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -124,7 +124,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.45, 0.15, 0.90),  
+            pos=(0.35, 0.15, 0.84),  
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
