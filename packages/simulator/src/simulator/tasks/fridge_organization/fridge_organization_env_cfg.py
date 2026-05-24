@@ -55,7 +55,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     fridge: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/fridge",
         spawn=sim_utils.CuboidCfg(
-            size=(0.60, 0.60, 1.20),
+            size=(0.30, 0.30, 0.60),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
             mass_props=sim_utils.MassPropertiesCfg(mass=50.0),
             collision_props=sim_utils.CollisionPropertiesCfg(),
@@ -64,7 +64,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.75, 0.0, 0.60),
+            pos=(0.75, 0.0, 0.30),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
