@@ -4,9 +4,10 @@ import isaaclab.sim as sim_utils
 import torch
 
 from isaaclab.assets import AssetBaseCfg, RigidObject, RigidObjectCfg
+from isaaclab.managers import ObservationGroupCfg as ObsGroup
+from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
-from isaaclab.sim.schemas import MassPropertiesCfg
 from isaaclab.utils import configclass
 
 from leisaac.utils.general_assets import parse_usd_and_create_subassets
@@ -17,8 +18,8 @@ from simulator.assets.scenes.kitchen import (
     KITCHEN_USD_PATH,
 )
 
+from simulator.tasks.template import mdp
 from simulator.tasks.template.single_arm_franka_cfg import (
-    SingleArmFrankaObservationsCfg,
     SingleArmFrankaTaskEnvCfg,
     SingleArmFrankaTaskSceneCfg,
     SingleArmFrankaTerminationsCfg,
@@ -45,11 +46,16 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
         prim_path="{ENV_REGEX_NS}/Scene"
     )
 
+    # cameras disabled for headless operation; re-enable on GlowsAI with --enable_cameras
+    wrist = None
+    front = None
+
     # -----------------------------------------------------
     # Fridge (static large object)
     # -----------------------------------------------------
 
-    fridge: RigidObjectCfg = RigidObjectCfg(
+    # fridge is static — use AssetBaseCfg, no RigidBodyAPI needed
+    fridge: AssetBaseCfg = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Scene/fridge",
         spawn=sim_utils.UsdFileCfg(
             usd_path=str(
@@ -59,7 +65,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
             scale=(1.0, 1.0, 1.0),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(
+        init_state=AssetBaseCfg.InitialStateCfg(
             pos=(0.75, 0.0, 0.0),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
@@ -69,16 +75,17 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     # Apple
     # -----------------------------------------------------
 
+    # placeholder shapes — replace with complete USD packages once available
     apple: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/apple",
-        spawn=sim_utils.UsdFileCfg(
-            usd_path=str(
-                FRIDGE_OBJECTS_ROOT
-                / "apple"
-                / "model_FakeFruit_5404E_RomeRedApple_69323.usd"
+        spawn=sim_utils.SphereCfg(
+            radius=0.04,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(
+                diffuse_color=(0.8, 0.1, 0.1)
             ),
-            mass_props=MassPropertiesCfg(mass=0.05),
-            scale=(1.0, 1.0, 1.0),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.35, -0.20, 0.85),
@@ -92,14 +99,15 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
 
     drink: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/drink",
-        spawn=sim_utils.UsdFileCfg(
-            usd_path=str(
-                FRIDGE_OBJECTS_ROOT
-                / "drink"
-                / "model_drink002.usd"
+        spawn=sim_utils.CylinderCfg(
+            radius=0.03,
+            height=0.12,
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.15),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(
+                diffuse_color=(0.1, 0.3, 0.8)
             ),
-            mass_props=MassPropertiesCfg(mass=0.15),
-            scale=(1.0, 1.0, 1.0),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.35, 0.00, 0.85),
@@ -113,20 +121,46 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
 
     snack: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/snack",
-        spawn=sim_utils.UsdFileCfg(
-            usd_path=str(
-                FRIDGE_OBJECTS_ROOT
-                / "snack"
-                / "model_snack012.usd"
+        spawn=sim_utils.CuboidCfg(
+            size=(0.08, 0.05, 0.03),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+            visual_material=sim_utils.PreviewSurfaceCfg(
+                diffuse_color=(0.9, 0.7, 0.2)
             ),
-            mass_props=MassPropertiesCfg(mass=0.05),
-            scale=(1.0, 1.0, 1.0),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.35, 0.20, 0.85),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
+
+
+# =========================================================
+# Observations (no cameras — headless compatible)
+# =========================================================
+
+
+@configclass
+class FridgeOrganizationObservationsCfg:
+    @configclass
+    class PolicyCfg(ObsGroup):
+        joint_pos = ObsTerm(func=mdp.joint_pos)
+        joint_vel = ObsTerm(func=mdp.joint_vel)
+        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel)
+        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
+        actions = ObsTerm(func=mdp.last_action)
+        joint_pos_target = ObsTerm(
+            func=mdp.joint_pos_target,
+            params={"asset_cfg": SceneEntityCfg("robot")},
+        )
+
+        def __post_init__(self):
+            self.enable_corruption = True
+            self.concatenate_terms = False
+
+    policy: PolicyCfg = PolicyCfg()
 
 
 # =========================================================
@@ -197,8 +231,8 @@ class FridgeOrganizationEnvCfg(
         FridgeOrganizationSceneCfg(env_spacing=8.0)
     )
 
-    observations: SingleArmFrankaObservationsCfg = (
-        SingleArmFrankaObservationsCfg()
+    observations: FridgeOrganizationObservationsCfg = (
+        FridgeOrganizationObservationsCfg()
     )
 
     terminations: TerminationsCfg = (
