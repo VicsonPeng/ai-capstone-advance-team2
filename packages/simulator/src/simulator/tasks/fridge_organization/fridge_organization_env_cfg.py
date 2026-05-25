@@ -15,6 +15,7 @@ from simulator.assets.scenes.kitchen import KITCHEN_CFG
 
 from simulator.tasks.template import mdp
 from simulator.tasks.template.single_arm_franka_cfg import (
+    SingleArmFrankaObservationsCfg,
     SingleArmFrankaTaskEnvCfg,
     SingleArmFrankaTaskSceneCfg,
     SingleArmFrankaTerminationsCfg,
@@ -34,39 +35,32 @@ FRIDGE_OBJECTS_ROOT = FRIDGE_ORG_ROOT / "objects"
 
 @configclass
 class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
-    """Scene configuration for fridge organization."""
+    """Scene configuration for bookcase organization."""
 
     scene: AssetBaseCfg = KITCHEN_CFG.replace(
         prim_path="{ENV_REGEX_NS}/Scene"
     )
 
-    wrist = None
-    front = None
+    # cameras inherited from parent — wrist + front both active
 
     # -----------------------------------------------------
-    # Fridge (kinematic box — hand arm's opposite side)
-    # Robot is at y=-0.74, facing +y, so fridge goes at y=+0.40
+    # Bookcase (USD model, static)
     # -----------------------------------------------------
 
-    fridge: RigidObjectCfg = RigidObjectCfg(
+    fridge: AssetBaseCfg = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Scene/fridge",
-        spawn=sim_utils.CuboidCfg(
-            size=(0.30, 0.30, 0.60),
-            rigid_props=sim_utils.RigidBodyPropertiesCfg(kinematic_enabled=True),
-            mass_props=sim_utils.MassPropertiesCfg(mass=50.0),
-            collision_props=sim_utils.CollisionPropertiesCfg(),
-            visual_material=sim_utils.PreviewSurfaceCfg(
-                diffuse_color=(0.8, 0.8, 0.9)
-            ),
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=str(FRIDGE_OBJECTS_ROOT / "fridge" / "model_fridge_1.usd"),
+            scale=(1.0, 1.0, 1.0),
         ),
-        init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.25, 0.20, 0.3),
+        init_state=AssetBaseCfg.InitialStateCfg(
+            pos=(0.45, 0.40, 0.0),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
     # -----------------------------------------------------
-    # Apple — on table, left side
+    # Apple
     # -----------------------------------------------------
 
     apple: RigidObjectCfg = RigidObjectCfg(
@@ -81,13 +75,13 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.3, -0.2, 0.2),
+            pos=(0.30, -0.20, 0.90),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
     # -----------------------------------------------------
-    # Drink — on table, center
+    # Drink
     # -----------------------------------------------------
 
     drink: RigidObjectCfg = RigidObjectCfg(
@@ -103,13 +97,13 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.45, -0.2, 0.2),
+            pos=(0.45, -0.20, 0.90),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
     # -----------------------------------------------------
-    # Snack — on table, right side
+    # Snack
     # -----------------------------------------------------
 
     snack: RigidObjectCfg = RigidObjectCfg(
@@ -124,36 +118,20 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.15, -0.2, 0.2),  
+            pos=(0.15, -0.20, 0.90),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
 
 
 # =========================================================
-# Observations
+# Observations — inherit from parent (includes wrist + front cameras)
 # =========================================================
 
 
 @configclass
-class FridgeOrganizationObservationsCfg:
-    @configclass
-    class PolicyCfg(ObsGroup):
-        joint_pos = ObsTerm(func=mdp.joint_pos)
-        joint_vel = ObsTerm(func=mdp.joint_vel)
-        joint_pos_rel = ObsTerm(func=mdp.joint_pos_rel)
-        joint_vel_rel = ObsTerm(func=mdp.joint_vel_rel)
-        actions = ObsTerm(func=mdp.last_action)
-        joint_pos_target = ObsTerm(
-            func=mdp.joint_pos_target,
-            params={"asset_cfg": SceneEntityCfg("robot")},
-        )
-
-        def __post_init__(self):
-            self.enable_corruption = True
-            self.concatenate_terms = False
-
-    policy: PolicyCfg = PolicyCfg()
+class FridgeOrganizationObservationsCfg(SingleArmFrankaObservationsCfg):
+    pass
 
 
 # =========================================================
@@ -161,21 +139,23 @@ class FridgeOrganizationObservationsCfg:
 # =========================================================
 
 
-def apple_inside_fridge(
+def apple_on_bookcase(
     env,
     apple_cfg: SceneEntityCfg,
 ) -> torch.Tensor:
+    """Success: apple placed on bookcase shelf."""
+
     apple: RigidObject = env.scene[apple_cfg.name]
     apple_pos = apple.data.root_pos_w - env.scene.env_origins
 
     done = torch.ones(env.num_envs, dtype=torch.bool, device=env.device)
 
-    # fridge bounds: x in [0.20, 0.50], y in [0.25, 0.55], z > 0.0
-    done = torch.logical_and(done, apple_pos[:, 0] > 0.20)
-    done = torch.logical_and(done, apple_pos[:, 0] < 0.50)
-    done = torch.logical_and(done, apple_pos[:, 1] > 0.25)
-    done = torch.logical_and(done, apple_pos[:, 1] < 0.55)
-    done = torch.logical_and(done, apple_pos[:, 2] > 0.00)
+    # bookcase region — adjust after seeing it in simulator
+    done = torch.logical_and(done, apple_pos[:, 0] > 0.25)
+    done = torch.logical_and(done, apple_pos[:, 0] < 0.65)
+    done = torch.logical_and(done, apple_pos[:, 1] > 0.20)
+    done = torch.logical_and(done, apple_pos[:, 1] < 0.60)
+    done = torch.logical_and(done, apple_pos[:, 2] > 0.10)
 
     return done
 
@@ -188,7 +168,7 @@ def apple_inside_fridge(
 @configclass
 class TerminationsCfg(SingleArmFrankaTerminationsCfg):
     success = DoneTerm(
-        func=apple_inside_fridge,
+        func=apple_on_bookcase,
         params={"apple_cfg": SceneEntityCfg("apple")},
     )
 
@@ -200,12 +180,12 @@ class TerminationsCfg(SingleArmFrankaTerminationsCfg):
 
 @configclass
 class FridgeOrganizationEnvCfg(SingleArmFrankaTaskEnvCfg):
-    """Fridge organization task."""
+    """Bookcase organization task."""
 
     scene: FridgeOrganizationSceneCfg = FridgeOrganizationSceneCfg(env_spacing=8.0)
     observations: FridgeOrganizationObservationsCfg = FridgeOrganizationObservationsCfg()
     terminations: TerminationsCfg = TerminationsCfg()
-    task_description: str = "pick up the apple and place it into the fridge."
+    task_description: str = "pick up the object and place it on the bookcase shelf."
 
     def __post_init__(self) -> None:
         super().__post_init__()
