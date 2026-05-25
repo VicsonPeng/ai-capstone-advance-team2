@@ -47,6 +47,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     # Bookcase (USD model, static)
     # -----------------------------------------------------
 
+    # Bookcase (was fridge)
     fridge: AssetBaseCfg = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Scene/fridge",
         spawn=sim_utils.UsdFileCfg(
@@ -58,64 +59,48 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
-
-    # -----------------------------------------------------
+    
     # Apple
-    # -----------------------------------------------------
-
     apple: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/apple",
-        spawn=sim_utils.SphereCfg(
-            radius=0.032,
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=str(FRIDGE_OBJECTS_ROOT / "apple" / "model_FakeFruit_5404E_RomeRedApple_69323.usd"),
+            scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
             collision_props=sim_utils.CollisionPropertiesCfg(),
-            visual_material=sim_utils.PreviewSurfaceCfg(
-                diffuse_color=(0.8, 0.1, 0.1)
-            ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.30, -0.20, 0.90),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
-
-    # -----------------------------------------------------
+    
     # Drink
-    # -----------------------------------------------------
-
     drink: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/drink",
-        spawn=sim_utils.CylinderCfg(
-            radius=0.024,
-            height=0.096,
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=str(FRIDGE_OBJECTS_ROOT / "drink" / "model_drink002.usd"),
+            scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
             collision_props=sim_utils.CollisionPropertiesCfg(),
-            visual_material=sim_utils.PreviewSurfaceCfg(
-                diffuse_color=(0.1, 0.3, 0.8)
-            ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.45, -0.20, 0.90),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
-
-    # -----------------------------------------------------
+    
     # Snack
-    # -----------------------------------------------------
-
     snack: RigidObjectCfg = RigidObjectCfg(
         prim_path="{ENV_REGEX_NS}/Scene/snack",
-        spawn=sim_utils.CuboidCfg(
-            size=(0.064, 0.04, 0.024),
+        spawn=sim_utils.UsdFileCfg(
+            usd_path=str(FRIDGE_OBJECTS_ROOT / "snack" / "model_snack012.usd"),
+            scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
             collision_props=sim_utils.CollisionPropertiesCfg(),
-            visual_material=sim_utils.PreviewSurfaceCfg(
-                diffuse_color=(0.9, 0.7, 0.2)
-            ),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
             pos=(0.15, -0.20, 0.90),
