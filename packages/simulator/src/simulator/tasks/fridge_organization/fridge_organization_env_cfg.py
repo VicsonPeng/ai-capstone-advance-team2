@@ -55,7 +55,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             scale=(1.0, 1.0, 1.0),
         ),
         init_state=AssetBaseCfg.InitialStateCfg(
-            pos=(0.45, 0.40, 0.0),
+            pos=(0.45, 0.20, 0.0),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -67,7 +67,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             usd_path=str(FRIDGE_OBJECTS_ROOT / "apple" / "model_FakeFruit_5404E_RomeRedApple_69323.usd"),
             scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.02),
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
@@ -83,7 +83,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             usd_path=str(FRIDGE_OBJECTS_ROOT / "drink" / "model_drink002.usd"),
             scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.02),
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
@@ -99,7 +99,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             usd_path=str(FRIDGE_OBJECTS_ROOT / "snack" / "model_snack012.usd"),
             scale=(1.0, 1.0, 1.0),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(),
-            mass_props=sim_utils.MassPropertiesCfg(mass=0.03),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.02),
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
