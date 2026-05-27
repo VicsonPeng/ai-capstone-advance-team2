@@ -55,7 +55,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             scale=(1.0, 1.0, 1.0),
         ),
         init_state=AssetBaseCfg.InitialStateCfg(
-            pos=(0.45, 0.0, 0.0),
+            pos=(0.45, 0.0, 0.2),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -71,7 +71,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.30, -0.20, 0.30),
+            pos=(0.30, -0.30, 0.30),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -87,7 +87,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.45, -0.20, 0.30),
+            pos=(0.45, -0.30, 0.30),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
@@ -103,7 +103,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
         init_state=RigidObjectCfg.InitialStateCfg(
-            pos=(0.15, -0.20, 0.30),
+            pos=(0.15, -0.30, 0.30),
             rot=(1.0, 0.0, 0.0, 0.0),
         ),
     )
