@@ -135,8 +135,8 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     front: TiledCameraCfg = TiledCameraCfg(
         prim_path="/World/front_camera",
         offset=TiledCameraCfg.OffsetCfg(
-            pos=(0.35, -0.6, 0.30),         # robot base 
-            rot=(0.0, 0.0, 1.0, 0.0),        # 朝 +y 方向
+            pos=(0.35, -0.7, 0.275),         # robot base 
+            rot=(0.7934, 0.6088, 0.0, 0.0),
             convention="opengl"
         ),
         data_types=["rgb"],
