@@ -55,8 +55,8 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
             scale=(1.0, 1.0, 1.0),
         ),
         init_state=AssetBaseCfg.InitialStateCfg(
-            pos=(0.37, -0.2, 0.05),
-            rot=(1.0, 0.0, 0.0, 0.0),
+            pos=(0.37, 1.0, 0.2),
+            rot=(0.0, 0.0, -0.707, 0.707), # -90 degrees
         ),
     )
     
