@@ -11,6 +11,8 @@ from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.utils import configclass
 
+from isaaclab.sensors import TiledCameraCfg
+
 from simulator.assets.scenes.kitchen import KITCHEN_CFG
 
 from simulator.tasks.template import mdp
@@ -48,6 +50,29 @@ OBZ = 0.10
 
 # Minimum distance between objects to avoid collision
 MIN_DIST = 0.08
+
+
+
+# override front camera — 從 robot base 往 +y 方向看
+front: TiledCameraCfg = TiledCameraCfg(
+    prim_path="/World/front_camera",
+    offset=TiledCameraCfg.OffsetCfg(
+        pos=(0.35, -0.6, 0.30),         # robot base 
+        rot=(0.0, 0.0, 1.0, 0.0),        # 朝 +y 方向
+        convention="opengl"
+    ),
+    data_types=["rgb"],
+    spawn=sim_utils.PinholeCameraCfg(
+        focal_length=24,
+        focus_distance=400.0,
+        horizontal_aperture=38.11,
+        clipping_range=(0.01, 50.0),
+        lock_camera=True,
+    ),
+    width=640,
+    height=480,
+    update_period=1 / 30.0,
+)
 
 
 def _kinematic_box(color, size, pos):
