@@ -39,12 +39,12 @@ RX, RY, RZ = 0.27, -0.10, 0.05
 BX, BY, BZ = 0.47, -0.10, 0.05
 
 # Red object spawn boundary
-ORX_MIN, ORX_MAX = 0.10, 0.60
+ORX_MIN, ORX_MAX = 0.20, 0.40
 ORY_MIN, ORY_MAX = -0.45, -0.25
 ORZ = 0.10
 
 # Blue object spawn boundary — 同一範圍
-OBX_MIN, OBX_MAX = 0.10, 0.60
+OBX_MIN, OBX_MAX = 0.20, 0.50
 OBY_MIN, OBY_MAX = -0.45, -0.25
 OBZ = 0.10
 
@@ -135,7 +135,7 @@ class FridgeOrganizationSceneCfg(SingleArmFrankaTaskSceneCfg):
     front: TiledCameraCfg = TiledCameraCfg(
         prim_path="/World/front_camera",
         offset=TiledCameraCfg.OffsetCfg(
-            pos=(0.35, -0.7, 0.275),         # robot base 
+            pos=(0.35, -0.6, 0.175),         # robot base 
             rot=(0.7934, 0.6088, 0.0, 0.0),
             convention="opengl"
         ),
