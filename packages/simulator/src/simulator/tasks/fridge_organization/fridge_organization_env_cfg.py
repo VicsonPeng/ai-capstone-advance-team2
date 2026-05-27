@@ -39,12 +39,12 @@ BX, BY, BZ = 0.47, -0.10, 0.05
 # Red object spawn boundary
 ORX_MIN, ORX_MAX = 0.10, 0.60
 ORY_MIN, ORY_MAX = -0.45, -0.25
-ORZ = 0.90
+ORZ = 0.10
 
 # Blue object spawn boundary — 同一範圍
 OBX_MIN, OBX_MAX = 0.10, 0.60
 OBY_MIN, OBY_MAX = -0.45, -0.25
-OBZ = 0.90
+OBZ = 0.10
 
 # Minimum distance between objects to avoid collision
 MIN_DIST = 0.08
