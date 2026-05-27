@@ -39,7 +39,7 @@ BX, BY, BZ = 0.47, -0.10, 0.05
 ORX, ORY, ORZ = 0.0, -0.12, 0.10
 
 # Blue container center (bottom center)
-OBX, OBY, OBZ = 0.65, -0.5, 0.10
+OBX, OBY, OBZ = 0.65, -0.45, 0.10
 
 
 def _kinematic_box(color, size, pos):
