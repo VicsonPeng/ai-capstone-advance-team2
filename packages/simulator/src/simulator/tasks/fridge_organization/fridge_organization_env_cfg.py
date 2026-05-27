@@ -30,16 +30,16 @@ H = 0.15   # inner height (z)
 T = 0.02   # wall thickness
 
 # Red container center (bottom center)
-RX, RY, RZ = 0.27, -0.10, 0.11
+RX, RY, RZ = 0.27, -0.10, 0.05
 
 # Blue container center (bottom center)
-BX, BY, BZ = 0.47, -0.10, 0.11
+BX, BY, BZ = 0.47, -0.10, 0.05
 
 # Red container center (bottom center)
-ORX, ORY, ORZ = 0.35, -0.30, 0.30
+ORX, ORY, ORZ = 0.2, -0.3, 0.10
 
 # Blue container center (bottom center)
-OBX, OBY, OBZ = 0.55, -0.30, 0.30
+OBX, OBY, OBZ = 0.7, -0.5, 0.10
 
 
 def _kinematic_box(color, size, pos):
