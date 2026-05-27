@@ -77,6 +77,8 @@ def randomize_object_positions(env, env_ids):
     apple: RigidObject = env.scene["apple"]
     drink: RigidObject = env.scene["drink"]
 
+    identity_quat = torch.tensor([1.0, 0.0, 0.0, 0.0], device=env.device)
+
     for env_id in env_ids:
         for _ in range(50):
             rx = float(torch.FloatTensor(1).uniform_(ORX_MIN, ORX_MAX))
@@ -91,17 +93,19 @@ def randomize_object_positions(env, env_ids):
         dev = env.device
         eid = torch.tensor([env_id], device=dev)
 
-        apple_pos = apple.data.root_pos_w.clone()
-        apple_pos[env_id, 0] = origin[0] + rx
-        apple_pos[env_id, 1] = origin[1] + ry
-        apple_pos[env_id, 2] = origin[2] + ORZ
-        apple.write_root_pos_to_sim(apple_pos[env_id].unsqueeze(0), env_ids=eid)
+        apple_pose = torch.zeros(1, 7, device=dev)
+        apple_pose[0, 0] = origin[0] + rx
+        apple_pose[0, 1] = origin[1] + ry
+        apple_pose[0, 2] = origin[2] + ORZ
+        apple_pose[0, 3:] = identity_quat
+        apple.write_root_pose_to_sim(apple_pose, env_ids=eid)
 
-        drink_pos = drink.data.root_pos_w.clone()
-        drink_pos[env_id, 0] = origin[0] + bx
-        drink_pos[env_id, 1] = origin[1] + by
-        drink_pos[env_id, 2] = origin[2] + OBZ
-        drink.write_root_pos_to_sim(drink_pos[env_id].unsqueeze(0), env_ids=eid)
+        drink_pose = torch.zeros(1, 7, device=dev)
+        drink_pose[0, 0] = origin[0] + bx
+        drink_pose[0, 1] = origin[1] + by
+        drink_pose[0, 2] = origin[2] + OBZ
+        drink_pose[0, 3:] = identity_quat
+        drink.write_root_pose_to_sim(drink_pose, env_ids=eid)
 
 
 # =========================================================
