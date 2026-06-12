@@ -39,7 +39,7 @@ RX, RY, RZ = 0.27, -0.10, 0.05
 BX, BY, BZ = 0.47, -0.10, 0.05
 
 # Red object spawn boundary
-ORX_MIN, ORX_MAX = 0.20, 0.40
+ORX_MIN, ORX_MAX = 0.20, 0.50
 ORY_MIN, ORY_MAX = -0.45, -0.25
 ORZ = 0.10
 
